@@ -1,6 +1,8 @@
 import { type Request, Response, NextFunction } from "express";
 import User from "../models/User";
 import { sign } from "jsonwebtoken";
+// import { generate } from "otp-generator";
+import { generateOtp, verifyOtp } from "generateotp-ts";
 
 const signToken = (userId: string) => sign({ userId }, process.env.JWT_SECRET);
 
@@ -62,3 +64,66 @@ export const register = async (
   req.body.userId = newUser._id;
   return next();
 };
+
+export const sendOTP = async (req: Request, res: Response) => {
+  const { userId } = req.body;
+  // Using otp-generator
+  // const newOtp = generate(6, {
+  //   lowerCaseAlphabets: false,
+  //   upperCaseAlphabets: false,
+  //   specialChars: false,
+  //   digits: true,
+  // });
+
+  // Using otp-generator-ts
+  const { /* otp, */ token } = generateOtp(6, "10m");
+  await User.findByIdAndUpdate(userId, {
+    otpToken: token,
+  });
+
+  // TODO: Send mail with otp to user
+
+  return res.status(200).json({
+    status: "success",
+    message: "OTP Sent Successfully!",
+  });
+};
+
+export const verifyOTP = async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const user = await User.findOne({ email });
+  if (!user)
+    return res.status(404).json({
+      status: "error",
+      message: "Email is invalid",
+    });
+
+  if (!verifyOtp(otp, user.otpToken))
+    return res.status(409).json({
+      status: "error",
+      message: "OTP is either invalid or expired. Please try again!",
+    });
+
+  user.verified = true;
+  user.otpToken = undefined;
+  await user.save({ validateModifiedOnly: true });
+  const token = signToken(user._id as unknown as string);
+
+  return res.status(200).json({
+    status: "success",
+    message: "OTP Verified Successfully!",
+    token,
+  });
+};
+
+// export const forgotPassword = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {};
+
+// export const resetPassword = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {};

@@ -13,6 +13,7 @@ export interface IUser extends Document {
   passwordResetExpires?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  otpToken?: string;
   correctPassword: (candidatePassword: string, userPassword: string) => boolean;
 }
 
@@ -52,6 +53,7 @@ const userSchema = new mongoose.Schema<IUser>({
   passwordResetExpires: Date,
   createdAt: Date,
   updatedAt: Date,
+  otpToken: String,
 });
 
 userSchema.methods.correctPassword = async (
