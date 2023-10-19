@@ -6,6 +6,7 @@ export interface IUser extends Document {
   lastName: string;
   avatar?: string;
   email: string;
+  verified: boolean;
   password: string;
   passwordChangedAt?: Date;
   passwordResetTokent?: string;
@@ -37,6 +38,10 @@ const userSchema = new mongoose.Schema<IUser>({
           ),
       message: ({ value }) => `Email: ${value} is invalid!`,
     },
+  },
+  verified: {
+    type: Boolean,
+    default: false,
   },
   password: {
     type: String,
