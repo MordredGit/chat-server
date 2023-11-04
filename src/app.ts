@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import cors from "cors";
+import router from "./routes";
 dotenv.config();
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(router);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
