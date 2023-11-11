@@ -15,7 +15,10 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   otpToken?: string;
-  correctPassword: (candidatePassword: string, userPassword: string) => boolean;
+  correctPassword: (
+    candidatePassword: string,
+    userPassword: string
+  ) => Promise<boolean>;
   createPasswordResetToken: () => string;
   changedPasswordAfterTokenIssued: (timeOfIssue: number) => boolean;
 }

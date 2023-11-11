@@ -1,20 +1,22 @@
 import { type Request, Response, NextFunction } from "express";
 import User from "../models/User";
-import { JwtPayload, sign, verify } from "jsonwebtoken";
+import jwtPkg, { JwtPayload } from "jsonwebtoken";
+const { sign, verify } = jwtPkg;
 // import { generate } from "otp-generator";
 import { generateOtp, verifyOtp } from "generateotp-ts";
 import crypto from "crypto";
 import { Types } from "mongoose";
 import { promisify } from "util";
+import { sendEmail } from "../services/mailer";
 
 const signToken = (userId: Types.ObjectId) =>
   sign({ userId }, process.env.JWT_SECRET);
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body();
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "error",
       message: "Email and password are required!",
     });
@@ -22,8 +24,8 @@ export const login = async (req: Request, res: Response) => {
 
   const user = await User.findOne({ email: email }).select("+password");
 
-  if (!user || user.correctPassword(password, user.password)) {
-    res.status(400).json({
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return res.status(400).json({
       status: "error",
       message: "Email or password is incorrect",
     });
@@ -31,7 +33,7 @@ export const login = async (req: Request, res: Response) => {
 
   const token = signToken(user._id);
 
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     message: "Logged in successfully",
     token,
@@ -65,6 +67,7 @@ export const register = async (
   }
 
   const newUser = await User.create({ firstName, lastName, email, password });
+  newUser.save();
   req.body.userId = newUser._id;
   return next();
 };
@@ -80,7 +83,7 @@ export const sendOTP = async (req: Request, res: Response) => {
   // });
 
   // Using otp-generator-ts
-  const { /* otp, */ token } = generateOtp(6, "10m");
+  const { otp, token } = generateOtp(6, "10m");
   await User.findByIdAndUpdate(userId, {
     otpToken: token,
   });
@@ -152,6 +155,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   try {
     // TODO: Send reset password mail to user
     console.log(resetUrl);
+    await user.save({ validateBeforeSave: false });
 
     return res.status(200).json({
       status: "success",
@@ -172,7 +176,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
   // 1. Get reset token and password from user.
-  const { resetToken, password } = req.body;
+  const { resetToken } = req.params;
+  const { password } = req.body;
+  console.log(resetToken, password);
 
   // 2. Get User from db based on reset token while checking if it is before the expiry time limit.
   const hashedToken = crypto
@@ -181,8 +187,9 @@ export const resetPassword = async (req: Request, res: Response) => {
     .digest("hex");
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
+  })
+    .where("passwordResetExpires")
+    .gt(Date.now());
   if (!user) {
     return res.status(400).json({
       status: "error",

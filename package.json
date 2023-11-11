@@ -21,6 +21,7 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/morgan": "^1.9.6",
     "@types/node": "^20.8.6",
+    "@types/node-mailjet": "^3.3.11",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "eslint": "^8.51.0",
     "eslint-config-standard-with-typescript": "^39.1.1",
@@ -44,6 +45,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.2",
     "morgan": "^1.10.0",
+    "node-mailjet": "^6.0.4",
     "xss": "^1.0.14",
     "xss-clean": "^0.1.4"
   }

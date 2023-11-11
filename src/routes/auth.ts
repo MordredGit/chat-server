@@ -11,10 +11,10 @@ import {
 const authRouter = Router();
 
 authRouter.post("/login", login);
-authRouter.post("/register", register);
+authRouter.post("/register", register, sendOTP);
 authRouter.post("/send-otp", sendOTP);
 authRouter.post("/verify-otp", verifyOTP);
 authRouter.post("/forgot-password", forgotPassword);
-authRouter.post("/reset-password", resetPassword);
+authRouter.post("/reset-password/:resetToken", resetPassword);
 
 export default authRouter;
