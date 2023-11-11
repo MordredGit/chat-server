@@ -27,7 +27,7 @@ jobs:
         with:
           tag-prefix: 'v'
           patch-wording:  'patch,fix,bugfix,fixes'
-          minor-wording:  'feat,Feature,Feat'
+          minor-wording:  'feat,Feat'
           major-wording:  'MAJOR,major'
           rc-wording:     'RELEASE,alpha'
         env:
