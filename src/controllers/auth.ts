@@ -86,11 +86,25 @@ export const sendOTP = async (req: Request, res: Response) => {
   });
 
   // TODO: Send mail with otp to user
-
-  return res.status(200).json({
-    status: "success",
-    message: "OTP Sent Successfully!",
-  });
+  sendEmail({
+    sender: "mshagun2001@gmail.com",
+    recepient: "pariber565@newnime.com",
+    subject: "OTP for Tawk",
+    text: `Your OTP is ${otp}. It is valid for 10 min from ${new Date().toLocaleString()}`,
+  })
+    .then(() => {
+      return res.status(200).json({
+        status: "success",
+        message: "OTP Sent Successfully!",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({
+        status: "error",
+        message: "OTP Could not be sent. Please try again later!",
+      });
+    });
 };
 
 export const verifyOTP = async (req: Request, res: Response) => {
