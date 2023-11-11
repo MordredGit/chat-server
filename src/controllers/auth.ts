@@ -176,9 +176,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
   // 1. Get reset token and password from user.
-  const { resetToken } = req.params;
-  const { password } = req.body;
-  console.log(resetToken, password);
+  const { resetToken, password } = req.body;
 
   // 2. Get User from db based on reset token while checking if it is before the expiry time limit.
   const hashedToken = crypto
