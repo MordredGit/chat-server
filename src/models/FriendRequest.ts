@@ -2,7 +2,8 @@ import mongoose, { CallbackWithoutResultAndOptionalError } from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-export interface IFriendRequest extends Document {
+export interface IFriendRequest
+  extends mongoose.Document<mongoose.Types.ObjectId> {
   sender: mongoose.Schema.Types.ObjectId;
   recipient: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
