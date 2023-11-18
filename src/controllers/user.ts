@@ -17,3 +17,17 @@ export const updateUserProfile = async (req: Request, res: Response) => {
     message: "Profile Updated Successfully",
   });
 };
+
+export const getUsers = async (req: Request, res: Response) => {
+  const currUser = req.body.user;
+  const allUsers = await User.find({
+    verified: true,
+    _id: { $nin: [currUser._id, ...currUser.friends] },
+  }).select("firstName lastName _id");
+
+  return res.status(200).json({
+    status: "success",
+    data: allUsers,
+    message: "Users found successfully",
+  });
+};
