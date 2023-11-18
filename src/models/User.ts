@@ -15,6 +15,7 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   otpToken?: string;
+  socketId?: string;
   friends?: mongoose.Schema.Types.ObjectId[];
   correctPassword: (
     candidatePassword: string,
@@ -61,6 +62,13 @@ const userSchema = new mongoose.Schema<IUser>({
   createdAt: Date,
   updatedAt: Date,
   otpToken: String,
+  socketId: String,
+  friends: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 userSchema.pre(
