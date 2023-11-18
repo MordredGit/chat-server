@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { Types } from "mongoose";
 import { promisify } from "util";
 import { sendEmail } from "../services/mailer";
+import resetPasswordHTMLMail from "../templates/resetPassword";
 
 const signToken = (userId: Types.ObjectId) =>
   sign({ userId }, process.env.JWT_SECRET);
@@ -91,14 +92,14 @@ export const sendOTP = async (req: Request, res: Response) => {
   // TODO: Send mail with otp to user
   sendEmail({
     sender: "mshagun2001@gmail.com",
-    recepient: "pariber565@newnime.com",
+    recepient: req.body.email,
     subject: "OTP for Tawk",
     text: `Your OTP is ${otp}. It is valid for 10 min from ${new Date().toLocaleString()}`,
   })
     .then(() => {
       return res.status(200).json({
         status: "success",
-        message: "OTP Sent Successfully!",
+        message: `OTP Sent Successfully to ${req.body.email}!`,
       });
     })
     .catch((err) => {
@@ -151,10 +152,17 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
   // 2. Generate random reset token.
   const resetToken = user.createPasswordResetToken();
-  const resetUrl = `https://localhost:3000/auth/reset-password/${resetToken}`;
+  const resetUrl = `http://localhost:3000/auth/new-password?token=${resetToken}`;
   try {
     // TODO: Send reset password mail to user
     console.log(resetUrl);
+    sendEmail({
+      sender: "mshagun2001@gmail.com",
+      recepient: user.email,
+      subject: "Forgot Password for Tawk",
+      // text: `Your OTP is ${otp}. It is valid for 10 min from ${new Date().toLocaleString()}`,
+      html: resetPasswordHTMLMail(user.firstName, resetUrl),
+    });
     await user.save({ validateBeforeSave: false });
 
     return res.status(200).json({
