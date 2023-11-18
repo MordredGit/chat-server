@@ -11,7 +11,7 @@ import { sendEmail } from "../services/mailer";
 import resetPasswordHTMLMail from "../templates/resetPassword";
 
 const signToken = (userId: Types.ObjectId) =>
-  sign({ userId }, process.env.JWT_SECRET);
+  sign({ userId, iat: Date.now() }, process.env.JWT_SECRET);
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -62,6 +62,7 @@ export const register = async (
       { firstName, lastName, password },
       { new: true, validateModifiedOnly: true }
     );
+    updatedUser.save();
 
     req.body.userId = updatedUser._id;
     return next();

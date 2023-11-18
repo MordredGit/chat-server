@@ -1,5 +1,5 @@
 import { type Request, Response } from "express";
-import User from "../models/User";
+import User, { IUser } from "../models/User";
 
 // Needs to be a protected route
 export const updateUserProfile = async (req: Request, res: Response) => {
@@ -19,7 +19,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 export const getUsers = async (req: Request, res: Response) => {
-  const currUser = req.body.user;
+  const currUser = req.body.user as IUser;
   const allUsers = await User.find({
     verified: true,
     _id: { $nin: [currUser._id, ...currUser.friends] },
