@@ -1,6 +1,6 @@
 {
   "name": "chat-server",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Server for Chat app",
   "type": "module",
   "main": "dist/app.js",
