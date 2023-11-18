@@ -15,6 +15,7 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   otpToken?: string;
+  friends?: mongoose.Schema.Types.ObjectId[];
   correctPassword: (
     candidatePassword: string,
     userPassword: string
