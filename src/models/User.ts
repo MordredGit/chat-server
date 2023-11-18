@@ -2,7 +2,7 @@ import mongoose, { CallbackWithoutResultAndOptionalError } from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-export interface IUser extends Document {
+export interface IUser extends mongoose.Document<mongoose.Types.ObjectId> {
   firstName: string;
   lastName: string;
   avatar?: string;
