@@ -1,15 +1,16 @@
-import { type Request, Response, NextFunction } from "express";
-import User from "../models/User";
-import jwtPkg, { JwtPayload } from "jsonwebtoken";
-const { sign, verify } = jwtPkg;
+import crypto from "crypto";
+import { NextFunction, Request, Response } from "express";
 // import { generate } from "otp-generator";
 import { generateOtp, verifyOtp } from "generateotp-ts";
-import crypto from "crypto";
+import jwtPkg, { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 import { promisify } from "util";
+
+import User from "../models/User";
 import { sendEmail } from "../services/mailer";
 import resetPasswordHTMLMail from "../templates/resetPassword";
 
+const { sign, verify } = jwtPkg;
 const signToken = (userId: Types.ObjectId) =>
   sign({ userId, iat: Date.now() }, process.env.JWT_SECRET);
 
@@ -231,8 +232,11 @@ export const protect = async (
   // Get JWT token and validating it.
   let token: string;
 
-  if (req.body.authorization && req.body.authorization.startsWith("Bearer")) {
-    token = req.body.authorization.split(" ")[1];
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   } else {
