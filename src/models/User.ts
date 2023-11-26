@@ -1,6 +1,6 @@
-import mongoose, { CallbackWithoutResultAndOptionalError } from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import mongoose, { CallbackWithoutResultAndOptionalError } from "mongoose";
 
 export interface IUser extends mongoose.Document<mongoose.Types.ObjectId> {
   firstName: string;
@@ -17,6 +17,7 @@ export interface IUser extends mongoose.Document<mongoose.Types.ObjectId> {
   otpToken?: string;
   socketId?: string;
   friends?: mongoose.Schema.Types.ObjectId[];
+  status: boolean;
   correctPassword: (
     candidatePassword: string,
     userPassword: string
@@ -69,6 +70,10 @@ const userSchema = new mongoose.Schema<IUser>({
       ref: "User",
     },
   ],
+  status: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.pre(
