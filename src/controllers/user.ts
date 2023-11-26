@@ -1,6 +1,7 @@
-import { type Request, Response } from "express";
-import User, { IUser } from "../models/User";
+import { Request, Response } from "express";
+
 import FriendRequest from "../models/FriendRequest";
+import User, { IUser } from "../models/User";
 
 // Needs to be a protected route
 export const updateUserProfile = async (req: Request, res: Response) => {
@@ -50,8 +51,7 @@ export const getFriendRequests = async (req: Request, res: Response) => {
   const currUser = req.body.user as IUser;
   const friendRequests = await FriendRequest.find({
     recipient: currUser._id,
-  }).populate("sender", "firstName lastName _id");
-
+  }).populate("sender", "firstName lastName _id status");
   return res.status(200).json({
     status: "success",
     data: friendRequests,
